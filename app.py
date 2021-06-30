@@ -10,7 +10,9 @@ def userList():
     refresh_list()
     list = []
     for c in Client.query.all():
-        list.append({'id':c.id, 'ip':c.ip})
+        list.append(c.id)
+        list.append(c.ip)
+        
     return {'users': list}
 
 def refresh_list():
@@ -25,7 +27,7 @@ def refresh_list():
 def online():
     ip = request.args.get('ip')
     id = request.args.get('id')
-    exist = Client.query.filter_by(ip=ip).first()
+    exist = Client.query.filter_by(id=id).first()
     if not exist:
         db.session.add(Client(ip, id, datetime.datetime.now()))
         db.session.commit()
@@ -35,7 +37,7 @@ def online():
 if __name__ == "__main__":
     if not os.path.isfile("./db/db.sqlite"):
             builtins.exec("from model import *")
-            builtins.exec("from app import db, app")
+            builtins.exec("from settings import db, app")
             builtins.exec("db.create_all(app=app)")    
     
     app.run(host='0.0.0.0',
