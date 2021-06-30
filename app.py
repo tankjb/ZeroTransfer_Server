@@ -1,14 +1,9 @@
 import datetime
 import os
 import builtins
-from flask import Flask, request, session
-from flask_sqlalchemy import SQLAlchemy
+from flask import request
 from model import *
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db/db.sqlite"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-db = SQLAlchemy(app=app)
+from settings import app, db
 
 @app.route('/userList', methods=['GET'])
 def userList():
@@ -22,14 +17,13 @@ def refresh_list():
     time = datetime.datetime.now()
     for c in Client.query.all():
         if (time - c.time).seconds > 600:
-            c.delete()
+            db.session.delete(c)
     db.session.commit()
     return
 
 @app.route('/online', methods=['GET'])
 def online():
     ip = request.args.get('ip')
-    refresh_list()
     exist = Client.query.filter_by(ip=ip).first()
     if not exist:
         db.session.add(Client(ip, datetime.datetime.now()))
