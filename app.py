@@ -10,7 +10,7 @@ def userList():
     refresh_list()
     list = []
     for c in Client.query.all():
-        list.append(c.ip)
+        list.append({'id':c.id, 'ip':c.ip})
     return {'users': list}
 
 def refresh_list():
@@ -24,9 +24,10 @@ def refresh_list():
 @app.route('/online', methods=['GET'])
 def online():
     ip = request.args.get('ip')
+    id = request.args.get('id')
     exist = Client.query.filter_by(ip=ip).first()
     if not exist:
-        db.session.add(Client(ip, datetime.datetime.now()))
+        db.session.add(Client(ip, id, datetime.datetime.now()))
         db.session.commit()
     return {'status': 'ok'}
         
